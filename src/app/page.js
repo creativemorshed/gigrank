@@ -708,20 +708,17 @@ function PricingModal({ onClose, onCreditsAdded }) {
   const [msg, setMsg] = useState({ text: "", ok: false });
   const [redeeming, setRedeeming] = useState(false);
 
-  const DEMO_KEYS = { "GIGA-FREE-DEMO-0001": 5, "STAR-TER1-TEST-0001": 10, "PRO1-2025-TEST-0001": 30 };
-
+  // Plans — display only, no direct credit addition
   const plans = [
-    { name: "STARTER", credits: 10, price: 4.99, per: 0.50, features: ["10 analyses", "All 7 modules", "2026 algorithm", "Never expire"] },
-    { name: "PRO", credits: 30, price: 9.99, per: 0.33, popular: true, features: ["30 analyses", "All 7 modules", "2026 algorithm", "Never expire"] },
-    { name: "AGENCY", credits: 100, price: 24.99, per: 0.25, features: ["100 analyses", "All 7 modules", "2026 algorithm", "Never expire"] },
+    { name: "STARTER", credits: 10, price: 4.99, per: 0.50, stripe: "https://buy.stripe.com/your-starter-link", features: ["10 analyses", "All 7 modules", "2026 algorithm", "Never expire"] },
+    { name: "PRO",     credits: 30, price: 9.99, per: 0.33, stripe: "https://buy.stripe.com/your-pro-link",     popular: true, features: ["30 analyses", "All 7 modules", "2026 algorithm", "Never expire"] },
+    { name: "AGENCY",  credits: 100, price: 24.99, per: 0.25, stripe: "https://buy.stripe.com/your-agency-link", features: ["100 analyses", "All 7 modules", "2026 algorithm", "Never expire"] },
   ];
 
+  // BUY NOW → opens Stripe payment page
+  // After payment, seller manually sends license key via email
   const buyPlan = (plan) => {
-    if (confirm(`[DEMO MODE]\n\nIn production, this opens Stripe for $${plan.price}.\n\nAdd ${plan.credits} demo credits now?`)) {
-      addCredits(plan.credits);
-      onCreditsAdded(plan.credits);
-      onClose();
-    }
+    window.open(plan.stripe, "_blank");
   };
 
   const formatKey = (v) => {
@@ -732,44 +729,42 @@ function PricingModal({ onClose, onCreditsAdded }) {
   const redeem = async () => {
     const k = licenseKey.trim().toUpperCase();
     if (!/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(k)) {
-      setMsg({ text: "Invalid key format.", ok: false }); return;
+      setMsg({ text: "Invalid key format. Example: ABCD-1234-EFGH-5678", ok: false }); return;
     }
     const used = JSON.parse(localStorage.getItem("gr_used_keys") || "[]");
-    if (used.includes(k)) { setMsg({ text: "Key already redeemed.", ok: false }); return; }
-
-    if (DEMO_KEYS[k] !== undefined) {
-      used.push(k);
-      localStorage.setItem("gr_used_keys", JSON.stringify(used));
-      addCredits(DEMO_KEYS[k]);
-      onCreditsAdded(DEMO_KEYS[k]);
-      setMsg({ text: `✅ ${DEMO_KEYS[k]} credits added!`, ok: true });
-      setTimeout(onClose, 1500);
-      return;
-    }
+    if (used.includes(k)) { setMsg({ text: "This key has already been redeemed on this device.", ok: false }); return; }
 
     setRedeeming(true);
+    setMsg({ text: "Verifying key...", ok: false });
     try {
-      const res = await fetch("/api/redeem", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: k }) });
+      const res  = await fetch("/api/redeem", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: k }) });
       const data = await res.json();
       if (data.success) {
         used.push(k);
         localStorage.setItem("gr_used_keys", JSON.stringify(used));
         addCredits(data.credits);
         onCreditsAdded(data.credits);
-        setMsg({ text: `✅ ${data.credits} credits added!`, ok: true });
-        setTimeout(onClose, 1500);
+        setMsg({ text: `✅ ${data.credits} credits added successfully!`, ok: true });
+        setTimeout(onClose, 1800);
       } else {
         setMsg({ text: data.error || "Invalid key.", ok: false });
       }
-    } catch { setMsg({ text: "Network error. Try again.", ok: false }); }
+    } catch { setMsg({ text: "Network error. Please try again.", ok: false }); }
     finally { setRedeeming(false); }
   };
 
   return (
     <div style={S.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
       <div style={{ ...S.modalBox, maxHeight: "90vh", overflowY: "auto" }}>
-        <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 900, letterSpacing: -0.5, marginBottom: 6 }}>Buy Analysis Credits</div>
-        <div style={{ fontSize: 13, color: "#475569", marginBottom: 24 }}>1 credit = 1 module use. Credits never expire.</div>
+
+        {/* Header */}
+        <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 900, letterSpacing: -0.5, marginBottom: 6 }}>Get Analysis Credits</div>
+        <div style={{ fontSize: 13, color: "#475569", marginBottom: 6 }}>1 credit = 1 module use. Credits never expire.</div>
+        <div style={{ background: "rgba(0,212,170,0.06)", border: "1px solid rgba(0,212,170,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#94a3b8", marginBottom: 24 }}>
+          ⚡ <strong style={{ color: "#00d4aa" }}>How it works:</strong> Purchase a plan → You receive a License Key via email → Enter the key below to activate credits.
+        </div>
+
+        {/* Plans */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
           {plans.map(p => (
             <div key={p.name} style={{ ...S.planCard, border: p.popular ? "1px solid #00d4aa" : "1px solid #1e293b" }}>
@@ -781,18 +776,35 @@ function PricingModal({ onClose, onCreditsAdded }) {
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 12px" }}>
                 {p.features.map((f, i) => <li key={i} style={{ fontSize: 11, color: "#94a3b8", marginBottom: 4, paddingLeft: 14, position: "relative" }}><span style={{ position: "absolute", left: 0, color: "#00d4aa" }}>✓</span>{f}</li>)}
               </ul>
-              <button onClick={() => buyPlan(p)} style={{ width: "100%", padding: 10, border: p.popular ? "none" : "1px solid #1e293b", borderRadius: 8, background: p.popular ? "#00d4aa" : "transparent", color: p.popular ? "#030712" : "#e2e8f0", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 11, cursor: "pointer" }}>BUY NOW →</button>
+              <button onClick={() => buyPlan(p)} style={{ width: "100%", padding: 10, border: p.popular ? "none" : "1px solid #1e293b", borderRadius: 8, background: p.popular ? "#00d4aa" : "transparent", color: p.popular ? "#030712" : "#e2e8f0", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 11, cursor: "pointer" }}>
+                BUY NOW →
+              </button>
             </div>
           ))}
         </div>
+
+        {/* License Key Redeem */}
         <div style={{ borderTop: "1px solid #1e293b", paddingTop: 20 }}>
-          <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 11, fontWeight: 800, letterSpacing: 2, color: "#475569", marginBottom: 10 }}>REDEEM LICENSE KEY</div>
+          <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 11, fontWeight: 800, letterSpacing: 2, color: "#00d4aa", marginBottom: 4 }}>REDEEM LICENSE KEY</div>
+          <div style={{ fontSize: 11, color: "#475569", marginBottom: 12 }}>Enter the key you received via email after purchase.</div>
           <div style={{ display: "flex", gap: 8 }}>
-            <input style={{ ...S.input, flex: 1 }} value={licenseKey} onChange={e => setLicenseKey(formatKey(e.target.value))} placeholder="XXXX-XXXX-XXXX-XXXX" maxLength={19} />
-            <button onClick={redeem} disabled={redeeming} style={{ ...S.buyBtn, whiteSpace: "nowrap", padding: "10px 18px" }}>{redeeming ? "..." : "REDEEM"}</button>
+            <input
+              style={{ ...S.input, flex: 1, borderColor: msg.ok ? "#00d4aa" : msg.text && !msg.ok ? "#ef4444" : "#1e293b" }}
+              value={licenseKey}
+              onChange={e => { setLicenseKey(formatKey(e.target.value)); setMsg({ text: "", ok: false }); }}
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              maxLength={19}
+            />
+            <button onClick={redeem} disabled={redeeming || licenseKey.length < 19}
+              style={{ ...S.buyBtn, whiteSpace: "nowrap", padding: "10px 18px", opacity: licenseKey.length < 19 ? 0.5 : 1 }}>
+              {redeeming ? "CHECKING..." : "REDEEM"}
+            </button>
           </div>
-          {msg.text && <div style={{ fontSize: 11, color: msg.ok ? "#00d4aa" : "#ef4444", marginTop: 6 }}>{msg.text}</div>}
-          <div style={{ fontSize: 11, color: "#334155", marginTop: 8 }}>Demo key: GIGA-FREE-DEMO-0001 (5 credits)</div>
+          {msg.text && (
+            <div style={{ fontSize: 11, color: msg.ok ? "#00d4aa" : "#ef4444", marginTop: 8, display: "flex", alignItems: "center", gap: 6 }}>
+              {msg.text}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -908,7 +920,7 @@ export default function App() {
               <div style={{ background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 14, padding: "20px 24px", marginBottom: 20, textAlign: "center" }}>
                 <div style={{ fontSize: 28, marginBottom: 8 }}>⚡</div>
                 <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, fontWeight: 900, color: "#ef4444", marginBottom: 6 }}>No Credits</div>
-                <div style={{ fontSize: 13, color: "#475569", marginBottom: 16 }}>Redeem key <strong style={{ color: "#e2e8f0" }}>GIGA-FREE-DEMO-0001</strong> to get 5 free credits</div>
+                <div style={{ fontSize: 13, color: "#475569", marginBottom: 16 }}>Purchase a plan → receive License Key via email → redeem to activate credits.</div>
                 <button style={{ ...S.buyBtn, padding: "12px 28px", fontSize: 13 }} onClick={() => setShowModal(true)}>GET CREDITS →</button>
               </div>
             )}
