@@ -4,9 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 // ─────────────────────────────────────────
 //  TRANSLATIONS
 // ─────────────────────────────────────────
-const LANG = {
-  en: {
-    brand: ["Gig","Rank"," AI"],
+const T = {
     buyCredits:"BUY CREDITS", creditsLabel:"CREDITS",
     tagline:"FIVERR GROWTH INTELLIGENCE — 2026 ALGORITHM",
     h1a:"GIG RANK", h1b:"ANALYZER",
@@ -87,89 +85,16 @@ const LANG = {
     highImpact:"HIGH IMPACT", medImpact:"MEDIUM IMPACT",
     strong:"STRONG", avg:"AVG", weak:"WEAK", low:"LOW", med:"MEDIUM", high:"HIGH",
     minPrice:"Suggested minimum",
-  },
-  bn: {
-    brand:["গিগ","র‍্যাংক"," AI"],
-    buyCredits:"ক্রেডিট কিনুন", creditsLabel:"ক্রেডিট",
-    tagline:"ফাইভার গ্রোথ ইন্টেলিজেন্স — ২০২৬ অ্যালগরিদম",
-    h1a:"গিগ র‍্যাংক", h1b:"বিশ্লেষক",
-    desc:"AI-চালিত ফাইভার গ্রোথ প্ল্যাটফর্ম। গিগ বিশ্লেষণ, প্রতিযোগী স্পাই, র‍্যাংক পূর্বাভাস, কন্টেন্ট রিরাইট, এবং ৯০-দিনের গ্রোথ রোডম্যাপ — ফাইভারের ২০২৬ অ্যালগরিদম দিয়ে।",
-    selectModule:"একটি মডিউল বেছে নিন",
-    noCredits:"ক্রেডিট নেই", noCreditsDesc:"একটি প্ল্যান কিনুন → ইমেইলে License Key পাবেন → ক্রেডিট চালু করতে key দিন।",
-    getCredits:"ক্রেডিট পান →",
-    modules:[
-      {label:"গিগ বিশ্লেষক",     desc:"সম্পূর্ণ ২০২৬ অ্যালগরিদম বিশ্লেষণ"},
-      {label:"প্রতিযোগী স্পাই",   desc:"শীর্ষ প্রতিযোগীদের সাথে তুলনা"},
-      {label:"র‍্যাংক পূর্বাভাস", desc:"৩০/৬০/৯০ দিনের পূর্বাভাস"},
-      {label:"গিগ রিরাইটার",      desc:"AI-অপ্টিমাইজড টাইটেল, বিবরণ, ট্যাগ"},
-      {label:"গ্রোথ রোডম্যাপ",   desc:"৯০-দিনের ধাপে ধাপে পরিকল্পনা"},
-      {label:"কীওয়ার্ড রিসার্চ", desc:"র‍্যাংকিং কীওয়ার্ড খুঁজুন"},
-    ],
-    credit:"ক্রেডিট", credits2:"ক্রেডিট",
-    urlTab:"🔗 গিগ URL", pasteTab:"📋 তথ্য পেস্ট করুন",
-    gigUrlLabel:"ফাইভার গিগ URL", gigUrlPlaceholder:"https://www.fiverr.com/username/gig-title",
-    gigInfoLabel:"গিগ তথ্য — বেশি বিবরণ = ভালো বিশ্লেষণ",
-    analyzeBtn:"গিগ র‍্যাংকিং বিশ্লেষণ করুন →", analyzingBtn:"বিশ্লেষণ হচ্ছে...",
-    myGigLabel:"আপনার গিগ তথ্য", compLabel:"প্রতিযোগী গিগ (২-৫টা পেস্ট করুন)",
-    spyBtn:"প্রতিযোগী বিশ্লেষণ করুন →", spyingBtn:"বিশ্লেষণ হচ্ছে...",
-    nicheLabel:"নিশ / ক্যাটাগরি", nichePlaceholder:"যেমন: লোগো ডিজাইন, ওয়ার্ডপ্রেস...",
-    scoreLabel:"বর্তমান স্কোর (ঐচ্ছিক)", scorePlaceholder:"যেমন: ৭২",
-    gigDetailsLabel:"গিগ বিবরণ",
-    predictBtn:"র‍্যাংকিং সম্ভাবনা পূর্বাভাস করুন →", predictingBtn:"পূর্বাভাস হচ্ছে...",
-    kwLabel:"লক্ষ্য কীওয়ার্ড", kwPlaceholder:"যেমন: মিনিমালিস্ট লোগো ডিজাইন",
-    nicheLabel2:"নিশ", nichePlaceholder2:"যেমন: লোগো ডিজাইন",
-    contentLabel:"বর্তমান গিগ কন্টেন্ট (টাইটেল + বিবরণ + ট্যাগ)",
-    rewriteBtn:"গিগ কন্টেন্ট রিরাইট করুন →", rewritingBtn:"রিরাইট হচ্ছে...",
-    gigInfoLabel2:"গিগ তথ্য", metricsLabel:"বর্তমান মেট্রিক্স (ঐচ্ছিক)",
-    roadmapBtn:"৯০-দিনের রোডম্যাপ তৈরি করুন →", generatingBtn:"রোডম্যাপ তৈরি হচ্ছে...",
-    nicheServiceLabel:"নিশ / সেবার ধরন *", nicheServicePlaceholder:"যেমন: লোগো ডিজাইন, SEO...",
-    titleLabel:"বর্তমান গিগ টাইটেল (ঐচ্ছিক)", audienceLabel:"লক্ষ্য দর্শক (ঐচ্ছিক)",
-    audiencePlaceholder:"যেমন: স্টার্টআপ, ই-কমার্স, ইউটিউবার...",
-    keywordBtn:"র‍্যাংকিং কীওয়ার্ড খুঁজুন →", keywordingBtn:"রিসার্চ হচ্ছে...",
-    tryAgain:"← আবার চেষ্টা করুন", allModules:"← সব মডিউল", running:"চলছে",
-    getCreditsTitle:"বিশ্লেষণ ক্রেডিট পান", creditDesc:"১ ক্রেডিট = ১ মডিউল ব্যবহার। ক্রেডিট মেয়াদ উত্তীর্ণ হয় না।",
-    howTitle:"কীভাবে কাজ করে:", howDesc:"একটি প্ল্যান কিনুন → ইমেইলে License Key পাবেন → নিচে key দিয়ে ক্রেডিট চালু করুন।",
-    popular:"জনপ্রিয়", buyNow:"এখন কিনুন →",
-    redeemTitle:"লাইসেন্স KEY রিডিম করুন", redeemDesc:"কেনার পর ইমেইলে পাওয়া key দিন।",
-    redeemPlaceholder:"XXXX-XXXX-XXXX-XXXX", checking:"যাচাই হচ্ছে...", redeemBtn:"রিডিম",
-    invalidKey:"ভুল key ফরম্যাট। উদাহরণ: ABCD-1234-EFGH-5678",
-    alreadyUsed:"এই key আগেই ব্যবহার হয়েছে।",
-    verifying:"Key যাচাই হচ্ছে...", networkErr:"নেটওয়ার্ক সমস্যা। আবার চেষ্টা করুন।",
-    algoFactors:"অ্যালগো ফ্যাক্টর", seoAudit:"SEO অডিট", actionPlan:"অ্যাকশন প্ল্যান",
-    topWins:"শীর্ষ সুবিধা", criticalIssues:"গুরুত্বপূর্ণ সমস্যা",
-    algoBreakdown:"২০২৬ অ্যালগরিদম ফ্যাক্টর বিশ্লেষণ",
-    titleSeo:"টাইটেল SEO বিশ্লেষণ", currentTitleLabel:"বর্তমান টাইটেল",
-    kwAtStart:"শুরুতে কীওয়ার্ড", slugOk:"Slug অপ্টিমাইজড",
-    suggestedTitle:"✨ প্রস্তাবিত অপ্টিমাইজড টাইটেল",
-    gigTagsLabel:"গিগ ট্যাগ", missingKw:"💡 মিসিং হাই-ভ্যালু কীওয়ার্ড",
-    slugAnalysisLabel:"🆕 ২০২৬ — গিগ URL স্লাগ বিশ্লেষণ",
-    pricingLabel:"🆕 ২০২৬ — প্রাইসিং সিগন্যাল",
-    actionPlanLabel:"অগ্রাধিকার ভিত্তিক অ্যাকশন প্ল্যান",
-    algoNoteLabel:"📌 অ্যালগরিদম নোট", freshnessLabel:"🆕 ২০২৬ — গিগ ফ্রেশনেস কৌশল",
-    multiGigLabel:"🆕 ২০২৬ — মাল্টি-গিগ কৌশল", compEdge:"🎯 প্রতিযোগী এজ",
-    marketOverview:"বাজার পর্যালোচনা", yourAdvantages:"আপনার সুবিধা", yourGaps:"আপনার দুর্বলতা",
-    compBreakdown:"প্রতিযোগী বিশ্লেষণ", pricingBench:"💰 প্রাইসিং বেঞ্চমার্ক",
-    marketGaps:"🎯 বাজারের সুযোগ", winStrategy:"🏆 জয়ের কৌশল",
-    currentScore:"বর্তমান স্কোর", targetScore:"লক্ষ্য স্কোর", projectedLevel:"প্রত্যাশিত লেভেল",
-    weekRoadmap:"📅 ৪-সপ্তাহের রোডম্যাপ", kpiTargets:"📊 KPI লক্ষ্যমাত্রা",
-    revenueImpact:"💰 আনুমানিক আয়ের প্রভাব",
-    primaryKw:"🎯 প্রধান কীওয়ার্ড", nicheOpp:"📈 নিশ সুযোগ",
-    kwOpportunities:"🔑 কীওয়ার্ড সুযোগ (১০টি)", suggestedTitleLabel:"✨ প্রস্তাবিত টাইটেল",
-    suggestedTagsLabel:"🏷️ প্রস্তাবিত ট্যাগ (৫/৫)", seasonalTips:"📅 মৌসুমী টিপস",
-    avoidKw:"🚫 এড়িয়ে চলুন",
-    optimizedTitle:"✨ অপ্টিমাইজড টাইটেল", optimizedTags:"🏷️ অপ্টিমাইজড ট্যাগ (৫/৫)",
-    optimizedDesc:"📝 অপ্টিমাইজড বিবরণ", packageSug:"💼 প্যাকেজ পরামর্শ",
-    faqsSug:"❓ প্রস্তাবিত FAQ", expectedImp:"📈 প্রত্যাশিত উন্নতি",
-    copy:"কপি", copied:"কপি হয়েছে ✓",
-    orders:"অর্ডার", confidence:"নিশ্চয়তা",
-    growthDrivers:"গ্রোথ চালক", riskFactors:"ঝুঁকির কারণ",
-    keyMilestones:"মূল মাইলস্টোন", recommendation:"📊 পরামর্শ",
-    week:"সপ্তাহ", month:"মাস", current:"বর্তমান", d30:"৩০ দিন", d90:"৯০ দিন",
-    highImpact:"উচ্চ প্রভাব", medImpact:"মধ্যম প্রভাব",
-    strong:"শক্তিশালী", avg:"গড়", weak:"দুর্বল", low:"কম", med:"মধ্যম", high:"বেশি",
-    minPrice:"সর্বনিম্ন প্রস্তাবিত",
-  },
+    quickFillBtn:"Quick Fill (optional)",
+    quickFillHint:"Add extra info for better analysis",
+    quickFillDesc:"Optional extra info for better analysis",
+    qfTitle:"GIG TITLE", qfRating:"RATING", qfReviews:"REVIEWS",
+    qfLevel:"SELLER LEVEL", qfPrice:"STARTING PRICE ($)",
+    qfDelivery:"DELIVERY (days)", qfResponse:"RESPONSE TIME",
+    qfOrders:"ORDERS IN QUEUE", qfTags:"TAGS",
+  }
 };
+
 
 // ─────────────────────────────────────────
 //  THEMES
@@ -667,56 +592,145 @@ function PrimaryBtn({label,onClick,loading,th}){
   );
 }
 
+// ─────────────────────────────────────────
+//  QUICK FILL HELPER
+// ─────────────────────────────────────────
+function buildGigInfo(url, fields) {
+  const parts = [];
+  if (url) parts.push(`Fiverr URL: ${url}`);
+  if (fields.title)        parts.push(`Title: ${fields.title}`);
+  if (fields.rating)       parts.push(`Rating: ${fields.rating} ⭐`);
+  if (fields.reviews)      parts.push(`Reviews: ${fields.reviews}`);
+  if (fields.level)        parts.push(`Seller Level: ${fields.level}`);
+  if (fields.price)        parts.push(`Starting Price: $${fields.price}`);
+  if (fields.delivery)     parts.push(`Delivery: ${fields.delivery} days`);
+  if (fields.responseTime) parts.push(`Response Time: ${fields.responseTime}`);
+  if (fields.orders)       parts.push(`Orders in Queue: ${fields.orders}`);
+  if (fields.tags)         parts.push(`Tags: ${fields.tags}`);
+  return parts.join("\n");
+}
+
+function QF({fields,onChange,th,t}){
+  const row=(label,key,ph,half=false)=>(
+    <div key={key} style={{flex:half?"1 1 45%":"1 1 100%",minWidth:120}}>
+      <label style={{fontSize:10,color:th.muted,marginBottom:5,display:"block",fontFamily:"'Syne',sans-serif",fontWeight:700,letterSpacing:1}}>{label}</label>
+      <input style={{width:"100%",background:th.input,border:`1px solid ${th.border}`,borderRadius:8,padding:"9px 12px",color:th.text,fontSize:12,outline:"none",fontFamily:"monospace",boxSizing:"border-box"}}
+        value={fields[key]||""} onChange={e=>onChange({...fields,[key]:e.target.value})} placeholder={ph}/>
+    </div>
+  );
+  return(
+    <div style={{background:th.surface,border:"1px solid #00d4aa33",borderRadius:14,padding:"16px 18px",marginBottom:12}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+        <span style={{fontSize:14}}>⚡</span>
+        <div>
+          <div style={{fontFamily:"'Syne',sans-serif",fontSize:10,fontWeight:800,letterSpacing:2,color:"#00d4aa"}}>QUICK FILL</div>
+          <div style={{fontSize:11,color:th.muted}}>{t.quickFillDesc}</div>
+        </div>
+      </div>
+      <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+        {row(t.qfTitle,"title","I will design a professional logo...")}
+        {row(t.qfRating,"rating","4.9",true)}
+        {row(t.qfReviews,"reviews","312",true)}
+        {row(t.qfLevel,"level","Level 2",true)}
+        {row(t.qfPrice,"price","25",true)}
+        {row(t.qfDelivery,"delivery","2",true)}
+        {row(t.qfResponse,"responseTime","1 hour",true)}
+        {row(t.qfOrders,"orders","8",true)}
+        {row(t.qfTags,"tags","logo design, minimalist logo, brand identity")}
+      </div>
+    </div>
+  );
+}
+
+function QFToggle({show,onToggle,th,t}){
+  return(
+    <div style={{marginBottom:12}}>
+      <button onClick={onToggle} style={{background:"transparent",border:`1px solid ${show?"#00d4aa":th.border}`,borderRadius:8,padding:"7px 14px",color:show?"#00d4aa":th.muted,fontSize:11,fontFamily:"'Syne',sans-serif",fontWeight:700,cursor:"pointer",transition:"all 0.2s"}}>
+        {show?"▲ Hide":"⚡ "+t.quickFillBtn}
+      </button>
+      {!show&&<span style={{fontSize:11,color:th.muted,marginLeft:8}}>{t.quickFillHint}</span>}
+    </div>
+  );
+}
+
 function AnalyzerForm({onSubmit,loading,t,th}){
-  const [mode,setMode]=useState("url");
   const [gigUrl,setGigUrl]=useState("");
-  const [gigInfo,setGigInfo]=useState("");
+  const [fields,setFields]=useState({});
+  const [show,setShow]=useState(false);
   return(
     <div>
-      <div style={{display:"flex",background:th.surface,border:`1px solid ${th.border}`,borderRadius:12,padding:4,marginBottom:12}}>
-        {["url","manual"].map(m=>(
-          <button key={m} onClick={()=>setMode(m)} style={{flex:1,padding:10,borderRadius:8,border:"none",cursor:"pointer",fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:11,letterSpacing:1.5,background:mode===m?"#00d4aa":"transparent",color:mode===m?"#030712":th.muted,transition:"all 0.2s"}}>
-            {m==="url"?t.urlTab:t.pasteTab}
-          </button>
-        ))}
-      </div>
-      {mode==="url"
-        ?<Inp label={t.gigUrlLabel} value={gigUrl} onChange={setGigUrl} placeholder={t.gigUrlPlaceholder} th={th}/>
-        :<Txta label={t.gigInfoLabel} value={gigInfo} onChange={setGigInfo} rows={8} placeholder={"Title: ...\nRating: 4.9 ⭐\nLevel: Level 2\nOrders in queue: 8\nTags: ...\nDescription: ..."} th={th}/>
-      }
-      <PrimaryBtn label={loading?t.analyzingBtn:t.analyzeBtn} onClick={()=>onSubmit({mode,gigUrl,gigInfo})} loading={loading} th={th}/>
+      <Inp label={t.gigUrlLabel} value={gigUrl} onChange={setGigUrl} placeholder={t.gigUrlPlaceholder} th={th}/>
+      <QFToggle show={show} onToggle={()=>setShow(!show)} th={th} t={t}/>
+      {show&&<QF fields={fields} onChange={setFields} th={th} t={t}/>}
+      <PrimaryBtn label={loading?t.analyzingBtn:t.analyzeBtn} onClick={()=>onSubmit({mode:"url",gigUrl,gigInfo:buildGigInfo(gigUrl,fields)})} loading={loading} th={th}/>
     </div>
   );
 }
 
 function CompetitorForm({onSubmit,loading,t,th}){
-  const [myGig,setMyGig]=useState("");
-  const [competitors,setCompetitors]=useState("");
+  const [myUrl,setMyUrl]=useState("");
+  const [myF,setMyF]=useState({});
+  const [showMy,setShowMy]=useState(false);
+  const [compUrls,setCompUrls]=useState("");
+  const [compF,setCompF]=useState([{},{},{}]);
+  const [showComp,setShowComp]=useState(false);
+  const handleSubmit=()=>{
+    const myGig=buildGigInfo(myUrl,myF)||myUrl;
+    const competitors=showComp
+      ?compF.map((f,i)=>{const s=buildGigInfo("",f);return s?`Competitor ${i+1}:\n${s}`:""}).filter(Boolean).join("\n\n")
+      :compUrls;
+    onSubmit({myGig,competitors});
+  };
   return(
     <div>
-      <Txta label={t.myGigLabel} value={myGig} onChange={setMyGig} rows={5} placeholder="Your gig title, price, rating, tags..." th={th}/>
-      <Txta label={t.compLabel} value={competitors} onChange={setCompetitors} rows={8} placeholder={"Competitor 1:\nURL/title, price, rating...\n\nCompetitor 2:\n..."} th={th}/>
-      <PrimaryBtn label={loading?t.spyingBtn:t.spyBtn} onClick={()=>onSubmit({myGig,competitors})} loading={loading} th={th}/>
+      <div style={{background:th.surface,border:`1px solid ${th.border}`,borderRadius:14,padding:"16px 18px",marginBottom:12}}>
+        <div style={{fontFamily:"'Syne',sans-serif",fontSize:9,fontWeight:800,letterSpacing:3,color:th.muted,marginBottom:10}}>{t.myGigLabel}</div>
+        <Inp label={t.gigUrlLabel} value={myUrl} onChange={setMyUrl} placeholder={t.gigUrlPlaceholder} th={th}/>
+        <QFToggle show={showMy} onToggle={()=>setShowMy(!showMy)} th={th} t={t}/>
+        {showMy&&<QF fields={myF} onChange={setMyF} th={th} t={t}/>}
+      </div>
+      <div style={{background:th.surface,border:`1px solid ${th.border}`,borderRadius:14,padding:"16px 18px",marginBottom:12}}>
+        <div style={{fontFamily:"'Syne',sans-serif",fontSize:9,fontWeight:800,letterSpacing:3,color:th.muted,marginBottom:10}}>{t.compLabel}</div>
+        <button onClick={()=>setShowComp(!showComp)} style={{background:"transparent",border:`1px solid ${showComp?"#0ea5e9":th.border}`,borderRadius:8,padding:"7px 14px",color:showComp?"#0ea5e9":th.muted,fontSize:11,fontFamily:"'Syne',sans-serif",fontWeight:700,cursor:"pointer",marginBottom:10}}>
+          {showComp?"✓ Quick Fill (3)":"⚡ Quick Fill (3 Competitors)"}
+        </button>
+        {!showComp
+          ?<Txta label="" value={compUrls} onChange={setCompUrls} rows={6} placeholder={"Competitor 1:\nURL/title, price, rating...\n\nCompetitor 2:\n..."} th={th}/>
+          :[0,1,2].map(i=>(
+            <div key={i} style={{marginBottom:8}}>
+              <div style={{fontSize:10,fontWeight:700,color:"#0ea5e9",fontFamily:"'Syne',sans-serif",letterSpacing:2,marginBottom:6}}>COMPETITOR {i+1}</div>
+              <QF fields={compF[i]} onChange={f=>{const a=[...compF];a[i]=f;setCompF(a);}} th={th} t={t}/>
+            </div>
+          ))
+        }
+      </div>
+      <PrimaryBtn label={loading?t.spyingBtn:t.spyBtn} onClick={handleSubmit} loading={loading} th={th}/>
     </div>
   );
 }
 
 function PredictForm({onSubmit,loading,t,th}){
-  const [gigInfo,setGigInfo]=useState("");
-  const [currentScore,setCurrentScore]=useState("");
+  const [gigUrl,setGigUrl]=useState("");
+  const [fields,setFields]=useState({});
+  const [show,setShow]=useState(false);
   const [niche,setNiche]=useState("");
+  const [currentScore,setCurrentScore]=useState("");
   return(
     <div>
       <Inp label={t.nicheLabel} value={niche} onChange={setNiche} placeholder={t.nichePlaceholder} th={th}/>
       <Inp label={t.scoreLabel} value={currentScore} onChange={setCurrentScore} placeholder={t.scorePlaceholder} th={th}/>
-      <Txta label={t.gigDetailsLabel} value={gigInfo} onChange={setGigInfo} rows={6} placeholder="Title, rating, orders, response rate, level..." th={th}/>
-      <PrimaryBtn label={loading?t.predictingBtn:t.predictBtn} onClick={()=>onSubmit({gigInfo,currentScore,niche})} loading={loading} th={th}/>
+      <Inp label={t.gigUrlLabel} value={gigUrl} onChange={setGigUrl} placeholder={t.gigUrlPlaceholder} th={th}/>
+      <QFToggle show={show} onToggle={()=>setShow(!show)} th={th} t={t}/>
+      {show&&<QF fields={fields} onChange={setFields} th={th} t={t}/>}
+      <PrimaryBtn label={loading?t.predictingBtn:t.predictBtn} onClick={()=>onSubmit({gigInfo:buildGigInfo(gigUrl,fields)||gigUrl,currentScore,niche})} loading={loading} th={th}/>
     </div>
   );
 }
 
 function RewriterForm({onSubmit,loading,t,th}){
-  const [gigContent,setGigContent]=useState("");
+  const [gigUrl,setGigUrl]=useState("");
+  const [fields,setFields]=useState({});
+  const [show,setShow]=useState(false);
   const [targetKeyword,setTargetKeyword]=useState("");
   const [niche,setNiche]=useState("");
   return(
@@ -725,37 +739,45 @@ function RewriterForm({onSubmit,loading,t,th}){
         <Inp label={t.kwLabel} value={targetKeyword} onChange={setTargetKeyword} placeholder={t.kwPlaceholder} th={th}/>
         <Inp label={t.nicheLabel2} value={niche} onChange={setNiche} placeholder={t.nichePlaceholder2} th={th}/>
       </div>
-      <Txta label={t.contentLabel} value={gigContent} onChange={setGigContent} rows={10} placeholder={"Title: ...\n\nDescription:\n...\n\nTags: ..., ..."} th={th}/>
-      <PrimaryBtn label={loading?t.rewritingBtn:t.rewriteBtn} onClick={()=>onSubmit({gigContent,targetKeyword,niche})} loading={loading} th={th}/>
+      <Inp label={t.gigUrlLabel} value={gigUrl} onChange={setGigUrl} placeholder={t.gigUrlPlaceholder} th={th}/>
+      <QFToggle show={show} onToggle={()=>setShow(!show)} th={th} t={t}/>
+      {show&&<QF fields={fields} onChange={setFields} th={th} t={t}/>}
+      <PrimaryBtn label={loading?t.rewritingBtn:t.rewriteBtn} onClick={()=>onSubmit({gigContent:buildGigInfo(gigUrl,fields)||gigUrl,targetKeyword,niche})} loading={loading} th={th}/>
     </div>
   );
 }
 
 function RoadmapForm({onSubmit,loading,t,th}){
-  const [gigInfo,setGigInfo]=useState("");
+  const [gigUrl,setGigUrl]=useState("");
+  const [fields,setFields]=useState({});
+  const [show,setShow]=useState(false);
   const [currentMetrics,setCurrentMetrics]=useState("");
   return(
     <div>
-      <Txta label={t.gigInfoLabel2} value={gigInfo} onChange={setGigInfo} rows={6} placeholder="Title, niche, rating, level, orders/month..." th={th}/>
-      <Txta label={t.metricsLabel} value={currentMetrics} onChange={setCurrentMetrics} rows={4} placeholder={"Orders this month: 12\nResponse rate: 95%\nOn-time delivery: 98%"} th={th}/>
-      <PrimaryBtn label={loading?t.generatingBtn:t.roadmapBtn} onClick={()=>onSubmit({gigInfo,currentMetrics})} loading={loading} th={th}/>
+      <Inp label={t.gigUrlLabel} value={gigUrl} onChange={setGigUrl} placeholder={t.gigUrlPlaceholder} th={th}/>
+      <QFToggle show={show} onToggle={()=>setShow(!show)} th={th} t={t}/>
+      {show&&<QF fields={fields} onChange={setFields} th={th} t={t}/>}
+      <Txta label={t.metricsLabel} value={currentMetrics} onChange={setCurrentMetrics} rows={3} placeholder={"Orders this month: 12\nResponse rate: 95%\nOn-time delivery: 98%"} th={th}/>
+      <PrimaryBtn label={loading?t.generatingBtn:t.roadmapBtn} onClick={()=>onSubmit({gigInfo:buildGigInfo(gigUrl,fields)||gigUrl,currentMetrics})} loading={loading} th={th}/>
     </div>
   );
 }
 
 function KeywordForm({onSubmit,loading,t,th}){
-  const [niche,setNiche]=useState("");
+  const [query,setQuery]=useState("");
   const [currentTitle,setCurrentTitle]=useState("");
   const [targetAudience,setTargetAudience]=useState("");
   return(
     <div>
-      <Inp label={t.nicheServiceLabel} value={niche} onChange={setNiche} placeholder={t.nicheServicePlaceholder} th={th}/>
+      <Inp label={`${t.gigUrlLabel} / ${t.nicheServiceLabel}`} value={query} onChange={setQuery} placeholder={"https://fiverr.com/... or Logo Design, SEO..."} th={th}/>
       <Inp label={t.titleLabel} value={currentTitle} onChange={setCurrentTitle} placeholder="Your existing gig title..." th={th}/>
       <Inp label={t.audienceLabel} value={targetAudience} onChange={setTargetAudience} placeholder={t.audiencePlaceholder} th={th}/>
-      <PrimaryBtn label={loading?t.keywordingBtn:t.keywordBtn} onClick={()=>onSubmit({niche,currentTitle,targetAudience})} loading={loading} th={th}/>
+      <PrimaryBtn label={loading?t.keywordingBtn:t.keywordBtn} onClick={()=>onSubmit({niche:query,currentTitle,targetAudience})} loading={loading} th={th}/>
     </div>
   );
 }
+
+
 
 // ─────────────────────────────────────────
 //  PRICING MODAL
@@ -846,20 +868,19 @@ export default function App(){
   const [error,setError]=useState("");
   const [modal,setModal]=useState(false);
   const [theme,setTheme]=useState("dark");
-  const [lang,setLang]=useState("en");
 
   const th=THEMES[theme]||THEMES.dark;
-  const t=LANG[lang]||LANG.en;
+  const t=T;
 
   useEffect(()=>{
     setCredits(gc());
     setTheme(localStorage.getItem("gr_theme")||"dark");
-    setLang(localStorage.getItem("gr_lang")||"en");
   },[]);
 
   const updC=()=>setCredits(gc());
   const toggleTheme=()=>{ const n=theme==="dark"?"light":"dark"; setTheme(n); localStorage.setItem("gr_theme",n); };
-  const toggleLang=()=>{ const n=lang==="en"?"bn":"en"; setLang(n); localStorage.setItem("gr_lang",n); };
+
+  const navBtn={background:th.surface,border:`1px solid ${th.border}`,borderRadius:20,padding:"6px 12px",cursor:"pointer",fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:11,color:th.muted,display:"flex",alignItems:"center",gap:5,transition:"all 0.2s"};
 
   const selectMod=m=>{
     if(gc()<m.cost){ setModal(true); return; }
@@ -886,7 +907,6 @@ export default function App(){
   const FormC=mod?FORMS[mod.id]:null;
   const ResC=mod?RESULTS[mod.id]:null;
 
-  const navBtn={background:th.surface,border:`1px solid ${th.border}`,borderRadius:20,padding:"6px 12px",cursor:"pointer",fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:11,color:th.muted,display:"flex",alignItems:"center",gap:5,transition:"all 0.2s"};
 
   return(
     <div style={{minHeight:"100vh",background:th.bg,transition:"background 0.3s",fontFamily:"'DM Sans',system-ui,sans-serif",color:th.text}}>
@@ -900,11 +920,11 @@ export default function App(){
       {/* NAV */}
       <div style={{position:"sticky",top:0,zIndex:100,background:th.nav,backdropFilter:"blur(16px)",borderBottom:`1px solid ${th.border}`,padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div onClick={reset} style={{fontFamily:"'Syne',sans-serif",fontWeight:900,fontSize:16,letterSpacing:-0.5,color:th.text,cursor:"pointer"}}>
-          {t.brand[0]}<span style={{color:"#00d4aa"}}>{t.brand[1]}</span>{t.brand[2]}
+          Gig<span style={{color:"#00d4aa"}}>Rank</span> AI
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <button onClick={toggleLang} style={navBtn}><span>{lang==="en"?"🇧🇩":"🇺🇸"}</span><span>{lang==="en"?"বাংলা":"EN"}</span></button>
-          <button onClick={toggleTheme} style={{...navBtn,fontSize:16}}>{theme==="dark"?"☀️":"🌙"}</button>
+
+          <button onClick={toggleTheme} title="Toggle Theme" style={{background:th.surface,border:`1px solid ${th.border}`,borderRadius:20,padding:"6px 12px",cursor:"pointer",fontSize:14,transition:"all 0.2s"}}>{theme==="dark"?"☀️":"🌙"}</button>
           <div onClick={()=>setModal(true)} style={{...navBtn,borderColor:credits<=3&&credits>0?"rgba(239,68,68,0.4)":th.border,cursor:"pointer"}}>
             <span>⚡</span>
             <span style={{fontFamily:"'Syne',sans-serif",fontWeight:900,fontSize:13,color:credits<=3&&credits>0?"#ef4444":"#00d4aa"}}>{credits}</span>
