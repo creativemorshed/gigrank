@@ -7,7 +7,7 @@ import { supabase, getCreditsFromDB, deductCredits } from "@/lib/supabase";
 // ─────────────────────────────────────────
 const T = {
     buyCredits:"BUY CREDITS", creditsLabel:"CREDITS",
-    tagline:"FIVERR GROWTH INTELLIGENCE — 2026 ALGORITHM",
+    tagline:"FIVERR INTELLIGENCE — 2026",
     h1a:"GIG RANK", h1b:"ANALYZER",
     desc:"AI-powered Fiverr growth platform. Analyze gigs, spy on competitors, predict rankings, rewrite content, and generate 90-day growth roadmaps — powered by Fiverr's 2026 algorithm.",
     selectModule:"SELECT A MODULE",
